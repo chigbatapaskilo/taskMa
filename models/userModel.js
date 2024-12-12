@@ -12,5 +12,5 @@ const userSchema=new mongoose.Schema({
     },
 
 },{timestamps:true})
-const userModel=mongoose.model('taskma',userSchema)
-module.exports=userModel
+const User=mongoose.model('user',userSchema)
+module.exports=User;

@@ -1,6 +1,6 @@
-const userModel=require('../models/userModel')
-const bcrypt=require('bcrypt')
-const jwt=require('jsonwebtoken')
+const User=require('../models/userModel');
+const bcrypt=require('bcrypt');
+const generateToken=require('../utils/jwt');
 exports.createUser=async(req,res)=>{
     try {
         const {email,password,confirmPassword}=req.body
@@ -9,7 +9,7 @@ exports.createUser=async(req,res)=>{
                 message:`please enter all fields`
             })
         }
-        const checkEmail=await userModel.findOne({email:email.toLowerCase()})
+        const checkEmail=await User.findOne({email:email.toLowerCase()})
         if(checkEmail){
             return res.status(400).json({
                 message:`a user with this email already exist`
@@ -22,11 +22,10 @@ exports.createUser=async(req,res)=>{
         }
         const saltPassword=await bcrypt.genSalt(10);
         const hashPassword=await bcrypt.hash(password,saltPassword)
-        const user=new userModel({
+        const user=new User({
             email:email.toLowerCase(),
             password:hashPassword
         })
-        console.log(user)
         await user.save()
         res.status(201).json({
             message:`welcome ${user.email}`,
@@ -57,7 +56,7 @@ exports.loginUser = async (req, res) => {
       }
   
       // Find the user by email, handle potential errors (early return)
-      const checkUser = await userModel.findOne({ email: email.toLowerCase() });
+      const checkUser = await User.findOne({ email: email.toLowerCase() });
       if (!checkUser) {
         return res.status(404).json({
           message: 'User with the email not found',
@@ -68,13 +67,12 @@ exports.loginUser = async (req, res) => {
       const checkPassword = await bcrypt.compare(password, checkUser.password);
       if (!checkPassword) {
         return res.status(400).json({
-          message:    'Incorrect password. Try again.',
+          message:'Incorrect password. Try again.',
         });
       }
   
       // Generate JWT token on successful login
-      const token = jwt.sign({ email: checkUser.email, userId: checkUser._id }, process.env.JWT_SECRET, { expiresIn: '5h' });
-  
+      const token = generateToken(checkUser._id,checkUser.email)
       // Send successful login response with token and user data
       res.status(200).json({
         message: 'Login successful',
@@ -82,7 +80,6 @@ exports.loginUser = async (req, res) => {
         token,
       });
     } catch (error) {
-      // Handle unexpected errors during login process
       console.error('Error during login:', error);
       res.status(500).json({
         message: 'Error trying to process your request',
@@ -92,8 +89,8 @@ exports.loginUser = async (req, res) => {
   };
 exports.getOneUser=async(req,res)=>{
  try {
-    const {userId}=req.user
-    const user=await userModel.findById(userId)
+    const {id}=req.params
+    const user=await User.findById(id)
     if(!user){
         return res.status(404).json({
             message:`user not found`

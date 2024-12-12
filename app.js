@@ -1,7 +1,8 @@
 const express =require("express")
 // const  swaggerUi  "swagger-ui-express"
 const cors=require("cors");
-const morgan=require("morgan")
+const morgan=require("morgan");
+const route = require("./routes/userRoute");
 // import fileUpload from "express-fileupload";
 // import swaggerSpec from "./utils/docs.setup.js";
 // import router from "./routers/userRoute.js";
@@ -21,7 +22,7 @@ app.get("/", (req, res)=>{
     })
 });
 
-// app.use("/api/v1", router);
+app.use("/api/v1", route);
 
 // app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
