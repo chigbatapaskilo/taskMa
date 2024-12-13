@@ -23,9 +23,10 @@ exports.createUser=async(req,res)=>{
         const saltPassword=await bcrypt.genSalt(10);
         const hashPassword=await bcrypt.hash(password,saltPassword)
         const user=new User({
-            email:email.toLowerCase(),
+            email:email.toLowerCase().trim(),
             password:hashPassword
         })
+        console.log(email)
         await user.save()
         res.status(201).json({
             message:`welcome ${user.email}`,
