@@ -105,3 +105,26 @@ exports.getAllTask=async(req,res)=>{
           })  
     }
 }
+exports.deleteTask=async(req,res)=>{
+  try {
+    const userId = req.user._id
+    const taskId=req.params
+    const task=await Task.findById(taskId);
+    if(!task){
+      return     res.status(400).json({
+        message: `task not found`,
+       
+      }) 
+    }
+    const deletetask=await Task.findByIdAndDelete(taskId)
+    res.status(200).json({
+      message:`delete sucessfully`
+    })
+    
+  } catch (error) {
+    res.status(500).json({
+      message: `server error`,
+      errorMessage: error.message,
+    })  
+  }
+}
