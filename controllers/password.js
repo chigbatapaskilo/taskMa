@@ -38,7 +38,7 @@ exports.resetPassword = async (req, res) => {
     try {
       const { token } = req.params;
       const { password } = req.body;
-      const { email } = Jwt.verify(passwordToken, process.env.JWT_SECRET);
+      const { email } = Jwt.verify(token, process.env.JWT_SECRET);
       const user = await userModel.findOne({ email });
       if (!user) {
         return res.status(404).json("user not found");
